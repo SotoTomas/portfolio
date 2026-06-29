@@ -201,11 +201,11 @@ const hoveredId = ref(null)
         </article>
       </div>
 
-      <!-- Nota de uso (solo visible en desarrollo, podés borrarla) -->
+      <!-- Nota de uso (solo visible en desarrollo, podés borrarla)
       <p class="portfolio__gif-note" data-reveal data-delay="200">
         Los GIFs se agregan en <code>/public/gifs/</code> y se referencian en el array
         <code>projects</code> dentro de este componente.
-      </p>
+      </p> -->
 
     </div>
   </section>
