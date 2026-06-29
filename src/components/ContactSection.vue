@@ -78,7 +78,6 @@ function handleSubmit() {
   >
     <div class="container contact__inner">
 
-      <!-- Columna izquierda: CTA + links -->
       <div class="contact__left">
         <span class="section-label" data-reveal>Contacto</span>
         <span class="divider" data-reveal data-delay="50" aria-hidden="true"></span>
@@ -112,79 +111,6 @@ function handleSubmit() {
           </a>
         </nav>
       </div>
-
-      <!-- Columna derecha: Formulario -->
-      <div class="contact__right" data-reveal data-delay="100">
-        <div class="contact__form-wrapper">
-
-          <!-- Estado de éxito -->
-          <div v-if="sent" class="contact__success" role="alert">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" stroke="var(--color-accent)" stroke-width="1.5"/>
-              <path d="M8 12l3 3 5-5" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <p>¡Mensaje enviado! Te respondo pronto.</p>
-            <button class="contact__success-reset" @click="sent = false">Enviar otro</button>
-          </div>
-
-          <!-- Formulario -->
-          <form v-else class="contact__form" @submit.prevent="handleSubmit" novalidate>
-            <h3 class="contact__form-title">Enviame un mensaje</h3>
-
-            <div class="form-field">
-              <label for="contact-name" class="form-label">Nombre</label>
-              <input
-                id="contact-name"
-                v-model="form.name"
-                type="text"
-                class="form-input"
-                placeholder="Tu nombre"
-                required
-                autocomplete="name"
-              />
-            </div>
-
-            <div class="form-field">
-              <label for="contact-email" class="form-label">Email</label>
-              <input
-                id="contact-email"
-                v-model="form.email"
-                type="email"
-                class="form-input"
-                placeholder="tu@email.com"
-                required
-                autocomplete="email"
-              />
-            </div>
-
-            <div class="form-field">
-              <label for="contact-message" class="form-label">Mensaje</label>
-              <textarea
-                id="contact-message"
-                v-model="form.message"
-                class="form-input form-textarea"
-                placeholder="Contame sobre tu proyecto..."
-                rows="5"
-                required
-              ></textarea>
-            </div>
-
-            <button
-              type="submit"
-              class="contact__submit"
-              :disabled="sending || !form.name || !form.email || !form.message"
-            >
-              <span v-if="!sending">Enviar mensaje</span>
-              <span v-else>Enviando…</span>
-              <svg v-if="!sending" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-          </form>
-
-        </div>
-      </div>
-
     </div>
   </section>
 </template>
@@ -193,7 +119,7 @@ function handleSubmit() {
 /* ── Contact ────────────────────────────────────────────── */
 .contact__inner {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 2fr;
   gap: var(--space-16);
   align-items: start;
 }

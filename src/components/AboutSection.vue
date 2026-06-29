@@ -39,7 +39,8 @@ const tags = [
 
         <p class="about__text" data-reveal data-delay="150">
           Soy Tomás, un desarrollador frontend y diseñador gráfico de Ramos Mejía, Buenos Aires.
-          Me formé en la Universidad Nacional de La Matanza y complementé mi carrera
+          Me formé de forma autodidacta y complementé mi conocimiento de programación
+          cursando la carrera de Diseño Gráfico y digital
           con desarrollo web full stack, especializándome en la intersección
           entre diseño visual y experiencia de usuario.
         </p>

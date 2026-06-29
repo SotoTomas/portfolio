@@ -7,6 +7,7 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
+  base:'/portfolio',
   server: {
     watch: {
       usePolling: true,   // Necesario en Windows para que HMR funcione
