@@ -23,12 +23,13 @@ const projects = [
     description:
       'Tienda virtual completa con panel administrativo, CRUD de productos, ' +
       'carrito de compras e integración de APIs de pago. Arquitectura MVC con ' +
-      'autenticación, roles de usuario y dashboard de gestión.',
+      'autenticación, roles de usuario y dashboard de gestión. Se inabilitó la base de dato, los middlewares y cualquier controlador existente',
     stack: ['Laravel', 'Vue.js', 'TailwindCSS', 'Inertia.js', 'MySQL'],
-    status: 'En curso',
-    gif: null,                                        // → Reemplazá con '/gifs/tvlaravel.gif'
+    status: 'Finalizado',
+    preview: null,   // → Imagen estática: '/previews/tvlaravel.jpg'
+    gif: null,       // → GIF animado:     '/gifs/tvlaravel.gif'
     github: 'https://github.com/SotoTomas/TVLaravel',
-    live: null,                                       // → Reemplazá con tu URL de deploy
+    live: null,
   },
   {
     id: 2,
@@ -37,13 +38,44 @@ const projects = [
     description:
       'Visualización de un mapa 3D interactivo con Three.js, ' +
       'donde el usuario puede rotar, hacer zoom y explorar ' +
-      'puntos de interés con información emergente. '+
+      'puntos de interés con información emergente. ' +
       'Hecho para ayudarme a estudiar para una evaluación de Historia del Arte.',
-    stack: ['Vue.js', 'HTML5', 'TailwindCSS', 'CSS3'],
-    status: 'En proceso de desarrollo',
-    gif: null,                                        // → Reemplazá con '/gifs/mapa-3d.gif'
+    stack: ['Vue.js', 'HTML5', 'TailwindCSS', 'CSS3', 'Three.js'],
+    status: 'En construcción',
+    preview: 'public/artmap.png',   // → '/previews/mapa-3d.jpg'
+    gif: 'gifs/artmap.gif',       // → '/gifs/mapa-3d.gif'
     github: 'https://github.com/SotoTomas/art-history-map',
     live: 'https://sototomas.github.io/art-history-map/',
+  },
+  {
+    id: 3,
+    number: '03',
+    title: 'Rosco de Palabras — Juego de Trivia',
+    description:
+      'Para mi carrera de Diseño Gráfico tuve que estudiar Historia del Arte. ' +
+      'Para ayudarme a memorizar los conceptos, hice un juego de trivia tipo "rosco" ' +
+      'donde el jugador debe adivinar palabras relacionadas con el tema. ' +
+      'El juego tiene diferentes opciones para configurar, como temporizador, modos de juego y un sistema de puntuación. ' +
+      'Posteriormente vendí el registro a mis compañeros de carrera, pero antes agregué a través de Firebase un login con cuentas de usuario y la posibilidad de denegar el acceso de una misma cuenta en diferentes dispositivos. ' +
+      'Login para probar: | usuario: prueba@gmail.com | contraseña: password',
+    stack: ['HTML', 'CSS', 'JavaScript', 'Firebase'],
+    status: 'En construcción',
+    preview: 'public/pasapalabra.png',          // → '/previews/pasapalabra.jpg'
+    gif: 'gifs/pasapalabra.gif',
+    github: 'https://github.com/SotoTomas/Pasapalabra',
+    live: 'https://sototomas.github.io/Pasapalabra/',
+  },
+  {
+    id: 4,
+    number: '04',
+    title: '',
+    description: '',
+    stack: [''],
+    status: '',
+    preview: null,
+    gif: null,
+    github: 'https://github.com/SotoTomas/proyecto-4',
+    live: 'https://sototomas.github.io/proyecto-4/',
   },
 ]
 
@@ -88,19 +120,37 @@ const hoveredId = ref(null)
           @mouseleave="hoveredId = null"
         >
 
-          <!-- ── Preview GIF ── -->
+          <!-- ── Preview ── -->
           <!--
-            El bloque de preview ocupa la parte superior de la card.
-            Si el proyecto tiene un GIF asignado, se muestra la imagen.
-            Si no, se muestra un placeholder con patrón y las iniciales del proyecto.
-            En ambos casos el contenido aparece con fade al hacer hover.
+            Capas apiladas (position: absolute), de abajo hacia arriba:
+              1. preview-img  → imagen estática JPG/PNG, siempre visible (opacity 1)
+              2. gif          → GIF animado, opacity 0 en reposo → 1 en hover
+              3. placeholder  → solo si no hay NINGUNA imagen (preview ni gif)
+
+            Al hacer hover, el GIF hace fade-in sobre la imagen estática,
+            dando la ilusión de que "cobra vida".
+
+            Para agregar imágenes a un proyecto:
+              preview: '/previews/nombre.jpg'   ← captura estática
+              gif:     '/gifs/nombre.gif'       ← animación en hover
+            Podés tener solo preview, solo gif, ambas o ninguna.
           -->
           <div
             class="project-card__preview"
             :class="{ 'project-card__preview--hovered': hoveredId === project.id }"
             aria-hidden="true"
           >
-            <!-- GIF real (cuando lo tenés) -->
+            <!-- Capa 1: imagen estática (base, siempre visible) -->
+            <img
+              v-if="project.preview"
+              :src="project.preview"
+              :alt="`Preview de ${project.title}`"
+              class="project-card__preview-img"
+              loading="lazy"
+              decoding="async"
+            />
+
+            <!-- Capa 2: GIF animado (encima, aparece en hover) -->
             <img
               v-if="project.gif"
               :src="project.gif"
@@ -110,16 +160,15 @@ const hoveredId = ref(null)
               decoding="async"
             />
 
-            <!-- Placeholder sin GIF -->
-            <div v-else class="project-card__gif-placeholder">
+            <!-- Placeholder: solo cuando no hay preview NI gif -->
+            <div
+              v-if="!project.preview && !project.gif"
+              class="project-card__gif-placeholder"
+            >
               <span class="project-card__gif-number">{{ project.number }}</span>
               <span class="project-card__gif-label">Preview</span>
             </div>
 
-            <!-- Overlay con título que aparece en hover -->
-            <div class="project-card__preview-overlay">
-              <span class="project-card__preview-title">{{ project.title }}</span>
-            </div>
           </div>
 
           <!-- ── Cuerpo de la card ── -->
@@ -200,13 +249,6 @@ const hoveredId = ref(null)
 
         </article>
       </div>
-
-      <!-- Nota de uso (solo visible en desarrollo, podés borrarla)
-      <p class="portfolio__gif-note" data-reveal data-delay="200">
-        Los GIFs se agregan en <code>/public/gifs/</code> y se referencian en el array
-        <code>projects</code> dentro de este componente.
-      </p> -->
-
     </div>
   </section>
 </template>
@@ -287,23 +329,45 @@ const hoveredId = ref(null)
 }
 .project-card:hover .project-card__accent { transform: scaleX(1); }
 
-/* ── Preview GIF ────────────────────────────────────────── */
+/* ── Preview ─────────────────────────────────────────────── */
+/*
+  Contenedor con position: relative para que las capas
+  (preview-img y gif) se apilen con position: absolute.
+*/
 .project-card__preview {
   position: relative;
   width: 100%;
-  height: 200px;           /* altura fija del área de preview */
+  height: 200px;
   overflow: hidden;
   background: var(--color-bg);
   flex-shrink: 0;
 }
 
-/* GIF real */
-.project-card__gif {
+/* Capa 1: imagen estática — base, siempre visible */
+.project-card__preview-img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  /* El GIF siempre está cargado; solo cambia opacidad */
+  opacity: 1;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+/* En hover: la imagen estática se oscurece levemente para que el GIF resalte */
+.project-card__preview--hovered .project-card__preview-img {
+  opacity: 0.15;
+}
+
+/* Capa 2: GIF animado — encima de la imagen estática, invisible en reposo */
+.project-card__gif {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
   opacity: 0;
   transform: scale(1.04);
   transition:
@@ -311,16 +375,15 @@ const hoveredId = ref(null)
     transform var(--duration-slow) var(--ease-out);
 }
 
-/* Placeholder sin GIF */
+/* Placeholder: ocupa todo el contenedor (sin imagen ni GIF) */
 .project-card__gif-placeholder {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  /* Patrón de líneas diagonales sutil */
   background-image:
     repeating-linear-gradient(
       -45deg,
