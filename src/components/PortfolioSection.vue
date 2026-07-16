@@ -1,16 +1,16 @@
 <script setup>
 // ─────────────────────────────────────────────────────────────
-// PortfolioSection.vue — Grilla de proyectos con preview GIF
+// PortfolioSection.vue — Grilla de proyectos con preview + GIF
 //
-// Cada proyecto puede tener:
-//   gif:    ruta al archivo GIF en /public/gifs/nombre.gif
-//           Si no tiene GIF, muestra un placeholder con gradiente.
-//   github: URL al repositorio
-//   live:   URL al deploy (Vercel, Netlify, etc.)
+// Sistema de capas en el área de preview:
+//   preview → imagen estática JPG/PNG, visible en reposo
+//   gif     → GIF animado, aparece en hover sobre la imagen
 //
-// El GIF se monta en el DOM desde el inicio pero permanece
-// invisible (opacity: 0). Al hacer hover sobre la card,
-// hace fade-in. Esto evita el delay de carga la primera vez.
+// Ambas usan v-show (no v-if) para que el browser las precargue
+// en background: cuando el usuario hace hover ya están listas.
+//
+// Rutas: siempre con barra inicial → '/previews/x.jpg', '/gifs/x.gif'
+// Archivos en: /public/previews/ y /public/gifs/
 // ─────────────────────────────────────────────────────────────
 
 import { ref } from 'vue'
@@ -23,13 +23,13 @@ const projects = [
     description:
       'Tienda virtual completa con panel administrativo, CRUD de productos, ' +
       'carrito de compras e integración de APIs de pago. Arquitectura MVC con ' +
-      'autenticación, roles de usuario y dashboard de gestión. Se inabilitó la base de dato, los middlewares y cualquier controlador existente',
+      'autenticación, roles de usuario y dashboard de gestión. Se inhabilitó la base de datos, los middlewares y cualquier controlador existente.',
     stack: ['Laravel', 'Vue.js', 'TailwindCSS', 'Inertia.js', 'MySQL'],
     status: 'Finalizado',
-    preview: null,   // → Imagen estática: '/previews/tvlaravel.jpg'
-    gif: null,       // → GIF animado:     '/gifs/tvlaravel.gif'
+    preview: null,          // → '/previews/tvlaravel.jpg'
+    gif:     null,          // → '/gifs/tvlaravel.gif'
     github: 'https://github.com/SotoTomas/TVLaravel',
-    live: null,
+    live:   null,
   },
   {
     id: 2,
@@ -42,10 +42,10 @@ const projects = [
       'Hecho para ayudarme a estudiar para una evaluación de Historia del Arte.',
     stack: ['Vue.js', 'HTML5', 'TailwindCSS', 'CSS3', 'Three.js'],
     status: 'En construcción',
-    preview: 'public/artmap.png',   // → '/previews/mapa-3d.jpg'
-    gif: 'gifs/artmap.gif',       // → '/gifs/mapa-3d.gif'
+    preview: '/portfolio/public/previews/artmap.png',   // imagen estática
+    gif:     '/portfolio/public/gifs/artmap.gif',       // animación en hover
     github: 'https://github.com/SotoTomas/art-history-map',
-    live: 'https://sototomas.github.io/art-history-map/',
+    live:   'https://sototomas.github.io/art-history-map/',
   },
   {
     id: 3,
@@ -59,11 +59,11 @@ const projects = [
       'Posteriormente vendí el registro a mis compañeros de carrera, pero antes agregué a través de Firebase un login con cuentas de usuario y la posibilidad de denegar el acceso de una misma cuenta en diferentes dispositivos. ' +
       'Login para probar: | usuario: prueba@gmail.com | contraseña: password',
     stack: ['HTML', 'CSS', 'JavaScript', 'Firebase'],
-    status: 'En construcción',
-    preview: 'public/pasapalabra.png',          // → '/previews/pasapalabra.jpg'
-    gif: 'gifs/pasapalabra.gif',
+    status: 'Finalizado',
+    preview: '/portfolio/public/previews/pasapalabra.png',          // → '/previews/pasapalabra.jpg'
+    gif:     '/portfolio/public/gifs/pasapalabra.gif',          // → '/gifs/pasapalabra.gif'
     github: 'https://github.com/SotoTomas/Pasapalabra',
-    live: 'https://sototomas.github.io/Pasapalabra/',
+    live:   'https://sototomas.github.io/Pasapalabra/',
   },
   {
     id: 4,
@@ -73,13 +73,13 @@ const projects = [
     stack: [''],
     status: '',
     preview: null,
-    gif: null,
+    gif:     null,
     github: 'https://github.com/SotoTomas/proyecto-4',
-    live: 'https://sototomas.github.io/proyecto-4/',
+    live:   'https://sototomas.github.io/proyecto-4/',
   },
 ]
 
-// Rastrear qué card está en hover para el GIF
+// ID del proyecto sobre el que está el cursor
 const hoveredId = ref(null)
 </script>
 
@@ -120,47 +120,44 @@ const hoveredId = ref(null)
           @mouseleave="hoveredId = null"
         >
 
-          <!-- ── Preview ── -->
-          <!--
-            Capas apiladas (position: absolute), de abajo hacia arriba:
-              1. preview-img  → imagen estática JPG/PNG, siempre visible (opacity 1)
-              2. gif          → GIF animado, opacity 0 en reposo → 1 en hover
-              3. placeholder  → solo si no hay NINGUNA imagen (preview ni gif)
+          <!-- ── Área de preview ────────────────────────────────
+            Tres capas apiladas con position: absolute:
+              1. preview-img  → JPG/PNG estático, siempre visible
+              2. gif          → GIF animado, fade-in en hover
+              3. placeholder  → solo si no hay ninguna imagen
 
-            Al hacer hover, el GIF hace fade-in sobre la imagen estática,
-            dando la ilusión de que "cobra vida".
+            IMPORTANTE: se usa v-show (no v-if) en las imágenes para
+            que el browser las descargue al cargar la página.
+            Cuando el usuario hace hover, el GIF ya está en memoria.
 
-            Para agregar imágenes a un proyecto:
-              preview: '/previews/nombre.jpg'   ← captura estática
-              gif:     '/gifs/nombre.gif'       ← animación en hover
-            Podés tener solo preview, solo gif, ambas o ninguna.
-          -->
+            Para agregar imágenes:
+              preview: '/previews/nombre.jpg'
+              gif:     '/gifs/nombre.gif'
+          ─────────────────────────────────────────────────── -->
           <div
             class="project-card__preview"
             :class="{ 'project-card__preview--hovered': hoveredId === project.id }"
             aria-hidden="true"
           >
-            <!-- Capa 1: imagen estática (base, siempre visible) -->
+            <!-- Capa 1: imagen estática (siempre en DOM, visible en reposo) -->
             <img
-              v-if="project.preview"
-              :src="project.preview"
+              v-show="project.preview"
+              :src="project.preview || ''"
               :alt="`Preview de ${project.title}`"
               class="project-card__preview-img"
-              loading="lazy"
               decoding="async"
             />
 
-            <!-- Capa 2: GIF animado (encima, aparece en hover) -->
+            <!-- Capa 2: GIF animado (siempre en DOM, visible solo en hover) -->
             <img
-              v-if="project.gif"
-              :src="project.gif"
+              v-show="project.gif"
+              :src="project.gif || ''"
               :alt="`Preview animado de ${project.title}`"
               class="project-card__gif"
-              loading="lazy"
               decoding="async"
             />
 
-            <!-- Placeholder: solo cuando no hay preview NI gif -->
+            <!-- Capa 3: placeholder cuando no hay ninguna imagen -->
             <div
               v-if="!project.preview && !project.gif"
               class="project-card__gif-placeholder"
@@ -171,15 +168,13 @@ const hoveredId = ref(null)
 
           </div>
 
-          <!-- ── Cuerpo de la card ── -->
+          <!-- ── Cuerpo ── -->
           <div class="project-card__body">
-
-            <!-- Número + estado -->
             <div class="project-card__top">
               <span class="project-card__number-label" aria-hidden="true">{{ project.number }}</span>
               <span
                 class="project-card__status"
-                :class="project.status === 'En curso' ? 'project-card__status--active' : ''"
+                :class="{ 'project-card__status--active': project.status === 'En curso' }"
               >
                 {{ project.status }}
               </span>
@@ -188,19 +183,15 @@ const hoveredId = ref(null)
             <h3 class="project-card__title">{{ project.title }}</h3>
             <p class="project-card__description">{{ project.description }}</p>
 
-            <!-- Stack -->
             <div class="project-card__stack" aria-label="Tecnologías utilizadas">
               <span v-for="tech in project.stack" :key="tech" class="project-card__tech">
                 {{ tech }}
               </span>
             </div>
-
           </div>
 
           <!-- ── Links ── -->
           <div class="project-card__links">
-
-            <!-- GitHub -->
             <a
               v-if="project.github"
               :href="project.github"
@@ -209,14 +200,12 @@ const hoveredId = ref(null)
               class="project-card__link"
               :aria-label="`Ver código de ${project.title} en GitHub`"
             >
-              <!-- Ícono GitHub -->
               <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
               </svg>
               GitHub
             </a>
 
-            <!-- Deploy / Live -->
             <a
               v-if="project.live"
               :href="project.live"
@@ -225,7 +214,6 @@ const hoveredId = ref(null)
               class="project-card__link project-card__link--live"
               :aria-label="`Ver deploy de ${project.title}`"
             >
-              <!-- Ícono external link -->
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
                 <polyline points="15 3 21 3 21 9"/>
@@ -234,14 +222,9 @@ const hoveredId = ref(null)
               Ver deploy
             </a>
 
-            <!-- Spacer: si no hay ningún link, mostrar un mensaje -->
-            <span
-              v-if="!project.github && !project.live"
-              class="project-card__no-links"
-            >
+            <span v-if="!project.github && !project.live" class="project-card__no-links">
               Próximamente
             </span>
-
           </div>
 
           <!-- Línea naranja superior en hover -->
@@ -249,12 +232,13 @@ const hoveredId = ref(null)
 
         </article>
       </div>
+
     </div>
   </section>
 </template>
 
 <style scoped>
-/* ── Portfolio header ───────────────────────────────────── */
+/* ── Header ─────────────────────────────────────────────── */
 .portfolio__header {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -262,30 +246,12 @@ const hoveredId = ref(null)
   align-items: end;
   margin-bottom: var(--space-16);
 }
-
 .portfolio__subtitle {
   font-size: var(--text-base);
   color: var(--color-muted);
   font-weight: 300;
   line-height: 1.7;
   padding-bottom: var(--space-2);
-}
-
-/* Nota de uso */
-.portfolio__gif-note {
-  margin-top: var(--space-8);
-  font-size: var(--text-xs);
-  color: var(--color-muted);
-  opacity: 0.5;
-  line-height: 1.6;
-}
-.portfolio__gif-note code {
-  font-family: monospace;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  padding: 1px 5px;
-  border-radius: 3px;
-  font-size: 0.9em;
 }
 
 /* ── Grid ───────────────────────────────────────────────── */
@@ -295,7 +261,7 @@ const hoveredId = ref(null)
   gap: var(--space-6);
 }
 
-/* ── Project Card ───────────────────────────────────────── */
+/* ── Card ───────────────────────────────────────────────── */
 .project-card {
   position: relative;
   background: var(--color-surface);
@@ -309,14 +275,13 @@ const hoveredId = ref(null)
     transform    var(--duration-base) var(--ease-out),
     background   var(--duration-base) var(--ease-out);
 }
-
 .project-card:hover {
   border-color: rgba(232, 97, 10, 0.35);
   transform: translateY(-4px);
   background: #202020;
 }
 
-/* Línea naranja superior */
+/* Línea naranja top */
 .project-card__accent {
   position: absolute;
   top: 0; left: 0; right: 0;
@@ -325,17 +290,13 @@ const hoveredId = ref(null)
   transform: scaleX(0);
   transform-origin: left;
   transition: transform var(--duration-base) var(--ease-out);
-  z-index: 2;
+  z-index: 10;
 }
 .project-card:hover .project-card__accent { transform: scaleX(1); }
 
-/* ── Preview ─────────────────────────────────────────────── */
-/*
-  Contenedor con position: relative para que las capas
-  (preview-img y gif) se apilen con position: absolute.
-*/
+/* ── Preview container ──────────────────────────────────── */
 .project-card__preview {
-  position: relative;
+  position: relative;      /* contexto para las capas absolutas */
   width: 100%;
   height: 200px;
   overflow: hidden;
@@ -350,32 +311,40 @@ const hoveredId = ref(null)
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center top;
   display: block;
   opacity: 1;
   transition: opacity var(--duration-base) var(--ease-out);
+  z-index: 1;
 }
-
-/* En hover: la imagen estática se oscurece levemente para que el GIF resalte */
+/* En hover se oscurece para que el GIF resalte encima */
 .project-card__preview--hovered .project-card__preview-img {
-  opacity: 0.15;
+  opacity: 0.12;
 }
 
-/* Capa 2: GIF animado — encima de la imagen estática, invisible en reposo */
+/* Capa 2: GIF animado — encima, invisible en reposo */
 .project-card__gif {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center top;
   display: block;
   opacity: 0;
   transform: scale(1.04);
   transition:
     opacity   var(--duration-base) var(--ease-out),
     transform var(--duration-slow) var(--ease-out);
+  z-index: 2;
+}
+/* En hover: GIF visible y sin zoom */
+.project-card__preview--hovered .project-card__gif {
+  opacity: 1;
+  transform: scale(1);
 }
 
-/* Placeholder: ocupa todo el contenedor (sin imagen ni GIF) */
+/* Capa 3: Placeholder (sin imágenes) */
 .project-card__gif-placeholder {
   position: absolute;
   inset: 0;
@@ -384,18 +353,14 @@ const hoveredId = ref(null)
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  background-image:
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 8px,
-      rgba(255,255,255,0.015) 8px,
-      rgba(255,255,255,0.015) 9px
-    );
-  opacity: 1;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent, transparent 8px,
+    rgba(255,255,255,0.015) 8px, rgba(255,255,255,0.015) 9px
+  );
+  z-index: 1;
   transition: opacity var(--duration-base) var(--ease-out);
 }
-
 .project-card__gif-number {
   font-family: var(--font-display);
   font-size: 3.5rem;
@@ -404,7 +369,6 @@ const hoveredId = ref(null)
   line-height: 1;
   transition: color var(--duration-base) var(--ease-out);
 }
-
 .project-card__gif-label {
   font-size: var(--text-xs);
   letter-spacing: 0.2em;
@@ -412,50 +376,11 @@ const hoveredId = ref(null)
   color: var(--color-border);
   transition: color var(--duration-base) var(--ease-out);
 }
+.project-card__preview--hovered .project-card__gif-placeholder { opacity: 0.4; }
+.project-card__preview--hovered .project-card__gif-number { color: var(--color-accent); }
+.project-card__preview--hovered .project-card__gif-label  { color: var(--color-muted); }
 
-/* Overlay con título que aparece en hover */
-.project-card__preview-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(22, 22, 22, 0.7);
-  backdrop-filter: blur(2px);
-  display: flex;
-  align-items: flex-end;
-  padding: var(--space-4);
-  opacity: 0;
-  transition: opacity var(--duration-base) var(--ease-out);
-}
-
-.project-card__preview-title {
-  font-family: var(--font-display);
-  font-size: var(--text-sm);
-  color: var(--color-text);
-  line-height: 1.3;
-}
-
-/* ── Estados en hover ───────────────────────────────────── */
-
-/* Si hay GIF: mostrarlo */
-.project-card__preview--hovered .project-card__gif {
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* Si hay placeholder: animar los textos y mostrar overlay */
-.project-card__preview--hovered .project-card__gif-placeholder {
-  opacity: 0.4;
-}
-.project-card__preview--hovered .project-card__gif-number {
-  color: var(--color-accent);
-}
-.project-card__preview--hovered .project-card__gif-label {
-  color: var(--color-muted);
-}
-.project-card__preview--hovered .project-card__preview-overlay {
-  opacity: 1;
-}
-
-/* ── Cuerpo de la card ──────────────────────────────────── */
+/* ── Cuerpo ─────────────────────────────────────────────── */
 .project-card__body {
   display: flex;
   flex-direction: column;
@@ -463,13 +388,11 @@ const hoveredId = ref(null)
   padding: var(--space-6) var(--space-6) var(--space-4);
   flex-grow: 1;
 }
-
 .project-card__top {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-
 .project-card__number-label {
   font-family: var(--font-display);
   font-size: var(--text-xs);
@@ -477,10 +400,8 @@ const hoveredId = ref(null)
   letter-spacing: 0.1em;
   font-style: italic;
 }
-
 .project-card__status {
   font-size: var(--text-xs);
-  font-weight: 400;
   color: var(--color-muted);
   border: 1px solid var(--color-border);
   padding: 2px var(--space-2);
@@ -492,7 +413,6 @@ const hoveredId = ref(null)
   border-color: rgba(74, 222, 128, 0.2);
   background: rgba(74, 222, 128, 0.05);
 }
-
 .project-card__title {
   font-family: var(--font-display);
   font-size: var(--text-xl);
@@ -500,7 +420,6 @@ const hoveredId = ref(null)
   color: var(--color-text);
   line-height: 1.25;
 }
-
 .project-card__description {
   font-size: var(--text-sm);
   color: var(--color-muted);
@@ -508,8 +427,6 @@ const hoveredId = ref(null)
   font-weight: 300;
   flex-grow: 1;
 }
-
-/* Stack tags */
 .project-card__stack {
   display: flex;
   flex-wrap: wrap;
@@ -535,7 +452,6 @@ const hoveredId = ref(null)
   border-top: 1px solid var(--color-border);
   flex-shrink: 0;
 }
-
 .project-card__link {
   display: inline-flex;
   align-items: center;
@@ -549,17 +465,16 @@ const hoveredId = ref(null)
 }
 .project-card__link:hover { color: var(--color-text); }
 
-/* Botón de deploy — estilo primario naranja */
 .project-card__link--live {
-  margin-left: auto;           /* empuja el deploy hacia la derecha */
+  margin-left: auto;
   color: var(--color-accent);
   border: 1px solid rgba(232, 97, 10, 0.25);
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-sm);
   background: var(--color-accent-dim);
   transition:
-    color       var(--duration-fast) var(--ease-out),
-    background  var(--duration-fast) var(--ease-out),
+    color        var(--duration-fast) var(--ease-out),
+    background   var(--duration-fast) var(--ease-out),
     border-color var(--duration-fast) var(--ease-out);
 }
 .project-card__link--live:hover {
@@ -567,11 +482,7 @@ const hoveredId = ref(null)
   background: var(--color-accent);
   border-color: var(--color-accent);
 }
-
-/* Si solo existe el botón de deploy (sin GitHub), no usar margin-left: auto */
-.project-card__links > .project-card__link--live:first-child {
-  margin-left: 0;
-}
+.project-card__links > .project-card__link--live:first-child { margin-left: 0; }
 
 .project-card__no-links {
   font-size: var(--text-xs);
@@ -591,11 +502,10 @@ const hoveredId = ref(null)
 
 /* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .portfolio__header { grid-template-columns: 1fr; }
-  .portfolio__grid   { grid-template-columns: 1fr; }
-  .project-card__preview { height: 180px; }
+  .portfolio__header          { grid-template-columns: 1fr; }
+  .portfolio__grid            { grid-template-columns: 1fr; }
+  .project-card__preview      { height: 180px; }
 }
-
 @media (max-width: 480px) {
   .project-card__preview { height: 150px; }
   .project-card__body    { padding: var(--space-4); }
