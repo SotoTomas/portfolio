@@ -23,13 +23,14 @@ const projects = [
     description:
       'Tienda virtual completa con panel administrativo, CRUD de productos, ' +
       'carrito de compras e integración de APIs de pago. Arquitectura MVC con ' +
-      'autenticación, roles de usuario y dashboard de gestión. Se inhabilitó la base de datos, los middlewares y cualquier controlador existente.',
+      'autenticación, roles de usuario y dashboard de gestión. Se inhabilitó la base de datos, los middlewares y cualquier controlador existente.' +
+      'Se desactivó todo lo referente al backend y a la base de datos. Se puede ver todo en el repositorio de GitHub, pero no hay deploy en vivo.',
     stack: ['Laravel', 'Vue.js', 'TailwindCSS', 'Inertia.js', 'MySQL'],
     status: 'Finalizado',
-    preview: null,          // → '/previews/tvlaravel.jpg'
-    gif:     null,          // → '/gifs/tvlaravel.gif'
+    preview: `${import.meta.env.BASE_URL}/previews/tienda-virtual.png`,          // → '/previews/tvlaravel.jpg'
+    gif:     `${import.meta.env.BASE_URL}/gifs/tienda-virtual.gif`,          // → '/gifs/tvlaravel.gif'
     github: 'https://github.com/SotoTomas/TVLaravel',
-    live:   null,
+    live:   'https://sototomas.github.io/tienda-virtual/',
   },
   {
     id: 2,
@@ -42,8 +43,8 @@ const projects = [
       'Hecho para ayudarme a estudiar para una evaluación de Historia del Arte.',
     stack: ['Vue.js', 'HTML5', 'TailwindCSS', 'CSS3', 'Three.js'],
     status: 'En construcción',
-    preview: '/portfolio/public/previews/artmap.png',   // imagen estática
-    gif:     '/portfolio/public/gifs/artmap.gif',       // animación en hover
+    preview: `${import.meta.env.BASE_URL}/previews/artmap.png`,   // imagen estática
+    gif:     `${import.meta.env.BASE_URL}/gifs/artmap.gif`,       // animación en hover
     github: 'https://github.com/SotoTomas/art-history-map',
     live:   'https://sototomas.github.io/art-history-map/',
   },
@@ -60,22 +61,22 @@ const projects = [
       'Login para probar: | usuario: prueba@gmail.com | contraseña: password',
     stack: ['HTML', 'CSS', 'JavaScript', 'Firebase'],
     status: 'Finalizado',
-    preview: '/portfolio/public/previews/pasapalabra.png',          // → '/previews/pasapalabra.jpg'
-    gif:     '/portfolio/public/gifs/pasapalabra.gif',          // → '/gifs/pasapalabra.gif'
+    preview: `${import.meta.env.BASE_URL}/previews/pasapalabra.png`,
+    gif:     `${import.meta.env.BASE_URL}/gifs/pasapalabra.gif`,
     github: 'https://github.com/SotoTomas/Pasapalabra',
     live:   'https://sototomas.github.io/Pasapalabra/',
   },
   {
     id: 4,
     number: '04',
-    title: '',
-    description: '',
-    stack: [''],
-    status: '',
-    preview: null,
-    gif:     null,
-    github: 'https://github.com/SotoTomas/proyecto-4',
-    live:   'https://sototomas.github.io/proyecto-4/',
+    title: 'Rediseño de página web - Comunidad Scout-guia San Pablo',
+    description: 'Rediseño de la página web de la Comunidad Scout-guia San Pablo, con énfasis en mejorar la experiencia del usuario y optimizar el rendimiento.',
+    stack: ['HTML', 'CSS', 'JavaScript'],
+    status: 'Finalizado',
+    preview: `${import.meta.env.BASE_URL}/previews/rediseñoWeb.png`,
+    gif:     `${import.meta.env.BASE_URL}/gifs/rediseñoWeb.gif`,
+    github: 'https://github.com/SotoTomas/scout-guia-sp',
+    live:   'https://sototomas.github.io/scout-guia-sp/',
   },
 ]
 
@@ -100,11 +101,12 @@ const hoveredId = ref(null)
           <h2 id="portfolio-title" class="section-title" data-reveal data-delay="100">
             Proyectos seleccionados.
           </h2>
-        </div>
-        <p class="portfolio__subtitle" data-reveal data-delay="150">
+          <p class="portfolio__subtitle" data-reveal data-delay="150">
           Trabajo en proyectos que resuelven problemas reales con diseño limpio
           y código de calidad.
         </p>
+        </div>
+        
       </div>
 
       <!-- Grilla -->

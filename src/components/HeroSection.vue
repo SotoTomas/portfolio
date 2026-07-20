@@ -9,6 +9,8 @@
 
 import { ref, onMounted } from 'vue'
 
+const photoSrc = `${import.meta.env.BASE_URL}/yo.jpg`
+
 const FULL_NAME = 'Tomás Soto.'
 const displayName = ref('')
 const showCursor = ref(true)
@@ -85,6 +87,7 @@ onMounted(() => {
             </svg>
           </a>
           <a href="#contacto" class="btn btn--ghost">Contactar</a>
+          <a href="https://drive.google.com/file/d/1puI-RE6yFmft3kPmQP4q3xNd4flg1JJV/view?usp=sharing" class="btn btn--ghost" target="_blank" rel="noopener noreferrer">Descargar CV</a>
         </div>
 
       </div>
@@ -97,7 +100,7 @@ onMounted(() => {
             PLACEHOLDER — Reemplazá este bloque por tu foto:
             <img src="/foto-perfil.jpg" alt="Tomás Soto" class="hero__photo-img" />
           -->
-          <img src="/yo.jpg" alt="Tomás Soto" class="hero__photo-img" />
+          <img :src="photoSrc" alt="Tomás Soto" class="hero__photo-img" />
           
 
           <!-- Decoración: línea naranja lateral -->

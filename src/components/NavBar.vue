@@ -71,14 +71,6 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
         </button>
       </nav>
 
-      <!-- CTA -->
-      <a
-        href="mailto:sototomas.nf@gmail.com"
-        class="navbar__cta"
-        aria-label="Contactar a Tomás por email"
-      >
-        Contactar
-      </a>
 
     </div>
   </header>
