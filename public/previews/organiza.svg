@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+  <rect width="1200" height="600" fill="#f0efe5"/>
+  <path d="M770 0v600M0 470h1200" stroke="#b8bca9"/>
+  <text x="70" y="110" fill="#526c54" font-family="Arial, sans-serif" font-size="22" letter-spacing="5">AGENDA Y GESTIÓN FREELANCE</text>
+  <text x="60" y="305" fill="#2d4235" font-family="Georgia, serif" font-size="148">Organiza.</text>
+  <text x="70" y="386" fill="#526c54" font-family="Arial, sans-serif" font-size="30">Tu trabajo, con espacio para pensar.</text>
+  <text x="70" y="544" fill="#526c54" font-family="Arial, sans-serif" font-size="24">CLIENTES / TAREAS / ENTREGAS</text>
+  <g fill="none" stroke="#355747" stroke-width="3">
+    <rect x="846" y="145" width="274" height="244" rx="8"/>
+    <path d="M846 213h274M916 123v46M1050 123v46"/>
+  </g>
+  <g fill="#b99b64">
+    <rect x="882" y="246" width="44" height="44" rx="3"/>
+    <rect x="960" y="246" width="44" height="44" rx="3"/>
+    <rect x="1038" y="317" width="44" height="44" rx="3"/>
+  </g>
+  <path d="m967 336 14 14 25-30" fill="none" stroke="#355747" stroke-width="4"/>
+  <text x="850" y="544" fill="#526c54" font-family="Arial, sans-serif" font-size="24">VUE 3 + ELECTRON</text>
+</svg>

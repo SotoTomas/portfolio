@@ -1,197 +1,134 @@
 <script setup>
-// ─────────────────────────────────────────────────────────────
-// NavBar.vue — Navegación fija con indicador de sección activa
-// y efecto de blur al scrollear hacia abajo
-// ─────────────────────────────────────────────────────────────
-
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-
-const isScrolled = ref(false)
-const activeSection = ref('hero')
-
-// Links de navegación
-const navLinks = [
-  { id: 'sobre-mi',  label: 'Sobre mí'  },
-  { id: 'portfolio', label: 'Portfolio'  },
-  { id: 'educacion', label: 'Educación'  },
-  { id: 'skills',    label: 'Skills'     },
-  { id: 'contacto',  label: 'Contacto'   },
-]
-
-// Detectar scroll para el efecto de fondo
-function onScroll() {
-  isScrolled.value = window.scrollY > 40
-
-  // Detectar sección activa con IntersectionObserver sería más eficiente,
-  // pero para simplicidad usamos getBoundingClientRect
-  const sections = document.querySelectorAll('[data-section]')
-  sections.forEach(section => {
-    const rect = section.getBoundingClientRect()
-    if (rect.top <= 120 && rect.bottom >= 120) {
-      activeSection.value = section.dataset.section
-    }
-  })
-}
-
-// Navegación suave al hacer clic
-function scrollTo(id) {
-  const el = document.getElementById(id)
-  if (el) el.scrollIntoView({ behavior: 'smooth' })
-}
-
-onMounted(() => window.addEventListener('scroll', onScroll, { passive: true }))
-onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
+import { ref, onMounted, onBeforeUnmount } from "vue";
+const active = ref("hero");
+let observer;
+onMounted(() => {
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) active.value = entry.target.id;
+      });
+    },
+    { rootMargin: "-20% 0px -55% 0px" },
+  );
+  document
+    .querySelectorAll("main > section")
+    .forEach((el) => observer.observe(el));
+});
+onBeforeUnmount(() => observer?.disconnect());
 </script>
-
 <template>
-  <!-- aria-label en el nav para accesibilidad WCAG -->
-  <header class="navbar" :class="{ 'navbar--scrolled': isScrolled }" role="banner">
-    <div class="container navbar__inner">
-
-      <!-- Logo / marca -->
-      <button
-        class="navbar__logo"
-        @click="scrollTo('hero')"
-        aria-label="Ir al inicio"
+  <header class="nav">
+    <div class="container nav-inner">
+      <a class="wordmark" href="#hero" aria-label="Tomás Soto, inicio"
+        >Tomás Soto<span aria-hidden="true">.</span></a
       >
-        TS<span class="navbar__logo-dot">.</span>
-      </button>
-
-      <!-- Links principales -->
-      <nav class="navbar__nav" aria-label="Navegación principal">
-        <button
-          v-for="link in navLinks"
+      <span class="nav-caption">DISEÑO &amp; DESARROLLO WEB</span>
+      <nav aria-label="Principal">
+        <a
+          v-for="link in [
+            { id: 'portfolio', label: 'Proyectos' },
+            { id: 'sobre-mi', label: 'Sobre mí' },
+            { id: 'contacto', label: 'Hablemos' },
+          ]"
           :key="link.id"
-          class="navbar__link"
-          :class="{ 'navbar__link--active': activeSection === link.id }"
-          @click="scrollTo(link.id)"
-          :aria-current="activeSection === link.id ? 'true' : undefined"
+          :href="'#' + link.id"
+          :aria-current="active === link.id ? 'location' : undefined"
+          >{{ link.label
+          }}<span v-if="link.id === 'contacto'" aria-hidden="true"> ↗</span></a
         >
-          {{ link.label }}
-        </button>
       </nav>
-
-
     </div>
   </header>
 </template>
-
 <style scoped>
-/* ── NavBar ─────────────────────────────────────────────── */
-.navbar {
-  position: fixed;
+.nav {
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  padding-block: var(--space-4);
-  transition: background var(--duration-base) var(--ease-out),
-              border-color var(--duration-base) var(--ease-out);
-  border-bottom: 1px solid transparent;
+  z-index: 30;
+  background: var(--color-bg);
 }
-
-/* Fondo con blur al scrollear */
-.navbar--scrolled {
-  background: rgba(22, 22, 22, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom-color: var(--color-border);
-}
-
-.navbar__inner {
+.nav-inner {
+  height: 92px;
   display: flex;
   align-items: center;
-  gap: var(--space-8);
+  gap: 55px;
+  border-bottom: 1px solid var(--color-border);
 }
-
-/* Logo */
-.navbar__logo {
-  background: none;
-  border: none;
-  cursor: pointer;
+.wordmark {
   font-family: var(--font-display);
-  font-size: var(--text-xl);
-  color: var(--color-text);
-  letter-spacing: -0.02em;
-  transition: opacity var(--duration-fast) var(--ease-out);
-  padding: 0;
-  flex-shrink: 0;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -1.1px;
+  white-space: nowrap;
 }
-.navbar__logo:hover { opacity: 0.7; }
-.navbar__logo-dot { color: var(--color-accent); }
-
-/* Links */
-.navbar__nav {
-  display: flex;
-  gap: var(--space-6);
-  margin-left: auto;       /* empuja el nav a la derecha */
-}
-
-.navbar__link {
-  background: none;
-  border: none;
-  cursor: pointer;
+.wordmark span {
   font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 400;
+  font-size: 12px;
+  vertical-align: top;
+  margin-left: 5px;
+  letter-spacing: 0;
+}
+.nav-caption {
+  font-size: 11px;
+  letter-spacing: 0.1em;
   color: var(--color-muted);
-  padding: var(--space-1) 0;
-  position: relative;
-  transition: color var(--duration-fast) var(--ease-out);
-  letter-spacing: 0.01em;
 }
-
-/* Línea activa debajo del link */
-.navbar__link::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--color-accent);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--duration-base) var(--ease-out);
+nav {
+  margin-left: auto;
+  display: flex;
+  gap: 35px;
 }
-
-.navbar__link:hover,
-.navbar__link--active {
-  color: var(--color-text);
+nav a {
+  font-size: 14px;
+  padding: 12px 0;
 }
-.navbar__link--active::after,
-.navbar__link:hover::after {
-  transform: scaleX(1);
-}
-
-/* CTA button */
-.navbar__cta {
-  background: none;
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 400;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-sm);
-  text-decoration: none;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: border-color var(--duration-fast) var(--ease-out),
-              background var(--duration-fast) var(--ease-out),
-              color var(--duration-fast) var(--ease-out);
-}
-.navbar__cta:hover {
-  border-color: var(--color-accent);
-  background: var(--color-accent-dim);
+nav a:hover,
+nav a[aria-current] {
   color: var(--color-accent);
 }
-
-/* ── Responsive ─────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .navbar__nav { display: none; }   /* Ocultamos links en móvil (se navega por scroll) */
+@media (max-width: 850px) {
+  .nav-caption {
+    display: none;
+  }
+  .nav-inner {
+    height: 76px;
+    gap: 20px;
+  }
+  nav {
+    gap: 22px;
+  }
 }
-@media (max-width: 480px) {
-  .navbar__cta { display: none; }
+@media (max-width: 440px) {
+  .wordmark {
+    font-size: 22px;
+  }
+  nav {
+    gap: 14px;
+  }
+  nav a {
+    font-size: 11px;
+  }
+}
+
+nav a {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+@media (max-width: 380px) {
+  .wordmark {
+    font-size: 17px;
+  }
+  .nav-inner {
+    gap: 8px;
+  }
+  nav {
+    gap: 8px;
+  }
+  nav a {
+    font-size: 10px;
+  }
 }
 </style>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <rect width="1200" height="675" fill="#f0eee2"/>
+  <path d="M810 0v675M0 540h1200" stroke="#c5bea5"/>
+  <text x="65" y="115" fill="#726746" font-family="Arial, sans-serif" font-size="22" letter-spacing="4">CUENTAS PARA LA COMUNIDAD</text>
+  <g fill="#494b36" font-family="Georgia, serif" font-size="105">
+    <text x="60" y="290">Caja</text>
+    <text x="60" y="410">San Pablo.</text>
+  </g>
+  <text x="65" y="480" fill="#726746" font-family="Arial, sans-serif" font-size="26">Cada movimiento, en su lugar.</text>
+  <g fill="none" stroke="#686a48" stroke-width="3">
+    <rect x="870" y="155" width="260" height="300" rx="12"/>
+    <rect x="900" y="190" width="200" height="58" rx="4"/>
+    <path d="M900 290h35m45 0h35m45 0h35M900 335h35m45 0h35m45 0h35M900 380h35m45 0h35"/>
+  </g>
+  <rect x="1055" y="365" width="45" height="55" rx="4" fill="#b69757"/>
+  <text x="65" y="613" fill="#726746" font-family="Arial, sans-serif" font-size="22" letter-spacing="2">VENTAS / STOCK / REPORTES</text>
+  <text x="850" y="613" fill="#726746" font-family="Arial, sans-serif" font-size="22">VUE 3 + ELECTRON</text>
+</svg>

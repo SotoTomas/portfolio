@@ -1,53 +1,40 @@
 <script setup>
-// ─────────────────────────────────────────────────────────────
-// FooterComponent.vue — Footer minimalista
-// ─────────────────────────────────────────────────────────────
-const year = new Date().getFullYear()
+const year = new Date().getFullYear();
 </script>
-
 <template>
-  <footer class="footer" role="contentinfo">
-    <div class="container footer__inner">
-      <span class="footer__brand">
-        Tomás Soto<span class="footer__dot">.</span>
-      </span>
-      <p class="footer__copy">
-        © {{ year }} — Diseñado y desarrollado en Buenos Aires, Argentina.
-      </p>
-      <p class="footer__made">
-        Hecho con Vue.js &amp; CSS puro.
-      </p>
-    </div>
+  <footer class="footer container">
+    <a href="#hero" class="footer-brand">Tomás Soto.</a>
+    <p>© {{ year }} · Diseño y código desde Buenos Aires.</p>
+    <a href="#hero" class="back-top">Volver al inicio ↑</a>
   </footer>
 </template>
-
 <style scoped>
 .footer {
+  padding-block: 25px;
   border-top: 1px solid var(--color-border);
-  padding-block: var(--space-8);
-}
-.footer__inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
-  flex-wrap: wrap;
+  gap: 20px;
 }
-.footer__brand {
+.footer-brand {
   font-family: var(--font-display);
-  font-size: var(--text-lg);
-  color: var(--color-text);
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
 }
-.footer__dot { color: var(--color-accent); }
-
-.footer__copy,
-.footer__made {
-  font-size: var(--text-xs);
+.footer p,
+.back-top {
+  font-size: 12px;
   color: var(--color-muted);
-  font-weight: 300;
 }
-
 @media (max-width: 600px) {
-  .footer__inner { flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+  .footer {
+    flex-wrap: wrap;
+  }
+  .footer p {
+    order: 3;
+    width: 100%;
+  }
 }
 </style>
