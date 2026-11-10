@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <rect width="1200" height="675" fill="#e8efec"/>
+  <path d="M790 0v675M0 535h1200" stroke="#a8bdb5"/>
+  <text x="65" y="115" fill="#4d7067" font-family="Arial, sans-serif" font-size="21" letter-spacing="4">GESTIÓN DOCUMENTAL PARA EMPRESAS</text>
+  <text x="60" y="330" fill="#244c43" font-family="Georgia, serif" font-size="140">Fageon.</text>
+  <text x="65" y="425" fill="#4d7067" font-family="Arial, sans-serif" font-size="27">Información clara. Evidencia presente.</text>
+  <g fill="none" stroke="#4d7067" stroke-width="3">
+    <path d="M885 150h145l65 65v230H885zM1030 150v65h65M920 265h140M920 300h95M920 335h65"/>
+    <path d="M850 245v-65h65M1065 480h65v-65" stroke="#aa8b55"/>
+    <circle cx="1035" cy="390" r="32"/>
+    <path d="m1018 390 12 12 23-27"/>
+  </g>
+  <text x="65" y="604" fill="#4d7067" font-family="Arial, sans-serif" font-size="22" letter-spacing="2">FACTURAS / RECIBOS / COMPROBANTES</text>
+  <text x="865" y="604" fill="#244c43" font-family="Arial, sans-serif" font-size="22">OCR + IA</text>
+</svg>

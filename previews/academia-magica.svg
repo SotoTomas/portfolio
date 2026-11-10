@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <rect width="1200" height="675" fill="#eee3ca"/>
+  <rect x="28" y="28" width="1144" height="619" rx="2" fill="none" stroke="#b49c68"/>
+  <path d="M800 28v619M28 535h1144" stroke="#b49c68"/>
+  <text x="65" y="115" fill="#736143" font-family="Arial, sans-serif" font-size="21" letter-spacing="4">UNA HISTORIA QUE ELEGÍS VIVIR</text>
+  <g fill="#483c4d" font-family="Georgia, serif" font-size="80">
+    <text x="60" y="260">Academia Mágica</text>
+    <text x="60" y="365">Latinoamericana.</text>
+  </g>
+  <text x="65" y="455" fill="#736143" font-family="Arial, sans-serif" font-size="26">Doce personajes. Tu propia aventura.</text>
+  <g fill="none" stroke="#736143" stroke-width="3">
+    <path d="M865 420V255a120 120 0 0 1 240 0v165zM890 420V260a95 95 0 0 1 190 0v160"/>
+    <path d="m985 200 15 42 44 2-35 27 12 42-36-25-36 25 12-42-35-27 44-2z"/>
+    <path d="M920 365q32-15 65 0 33-15 65 0v55q-33-15-65 0-33-15-65 0zM985 365v55"/>
+  </g>
+  <text x="65" y="604" fill="#736143" font-family="Arial, sans-serif" font-size="22" letter-spacing="2">MAGIA / VÍNCULOS / DECISIONES</text>
+  <text x="845" y="604" fill="#483c4d" font-family="Arial, sans-serif" font-size="22">DEMO CON IA ↗</text>
+</svg>
