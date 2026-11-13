@@ -36,7 +36,11 @@ const steps = [
 const current = ref(0);
 </script>
 <template>
-  <section id="sobre-mi" class="section about" aria-labelledby="about-title">
+  <section
+    id="sobre-mi"
+    class="section about theme-stone"
+    aria-labelledby="about-title"
+  >
     <div class="container">
       <div class="section-topline">
         <span class="eyebrow">02 / Detrás de la interfaz</span
@@ -172,7 +176,7 @@ const current = ref(0);
 </template>
 <style scoped>
 .about {
-  background: var(--color-surface);
+  background: var(--color-bg);
 }
 .about-grid {
   display: grid;
@@ -226,7 +230,7 @@ const current = ref(0);
   grid-column: 6 / -1;
 }
 .about-copy h2 {
-  font-size: clamp(40px, 4.3vw, 64px);
+  font-size: var(--text-feature);
   margin-bottom: 30px;
 }
 .about-copy > p {
@@ -256,7 +260,7 @@ const current = ref(0);
   text-align: left;
   border-bottom: 1px solid var(--color-border);
   font-family: var(--font-display);
-  font-size: 36px;
+  font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.04em;
   display: flex;
@@ -351,7 +355,7 @@ const current = ref(0);
     gap: 20px;
   }
   .process-buttons button {
-    font-size: 30px;
+    font-size: 24px;
     gap: 10px;
   }
 }
@@ -368,9 +372,6 @@ const current = ref(0);
   .about-copy {
     grid-column: 1 / -1;
   }
-  .about-copy h2 {
-    font-size: clamp(36px, 8.5vw, 48px);
-  }
   .process {
     margin-top: 55px;
   }
@@ -378,7 +379,7 @@ const current = ref(0);
     gap: 12px;
   }
   .process-buttons button {
-    font-size: clamp(18px, 5vw, 24px);
+    font-size: clamp(18px, 4.5vw, 22px);
     gap: 6px;
   }
   .process-buttons button > b {

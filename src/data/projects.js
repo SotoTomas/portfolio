@@ -1,5 +1,5 @@
 const asset = (path) => import.meta.env.BASE_URL + path;
-export const projects = [
+const projectData = [
   {
     id: "organiza",
     title: "Organiza",
@@ -10,9 +10,9 @@ export const projects = [
     description:
       "Agenda y gestión de clientes para profesionales freelance. Tareas, contactos y entregas conectados en un mismo espacio.",
     stack: ["Vue 3", "Tailwind CSS", "Electron"],
-    preview: asset("previews/organiza.svg"),
-    previewAlt: "Portada gráfica de Organiza",
-    download: "https://github.com/SotoTomas/portfolio/releases/download/organiza-v1.1.3/Organiza-Portable-1.1.3.exe",
+    preview: null,
+    download:
+      "https://github.com/SotoTomas/portfolio/releases/download/organiza-v1.1.3/Organiza-Portable-1.1.3.exe",
     downloadName: "Organiza-Portable-1.1.3.exe",
     downloadSize: "113 MB",
     github: null,
@@ -36,8 +36,7 @@ export const projects = [
     description:
       "Herramienta contable para gestionar ventas, productos, stock y gastos de ferias, eventos y campamentos de la comunidad San Pablo.",
     stack: ["Vue 3", "IndexedDB", "Electron"],
-    preview: asset("previews/caja-san-pablo.svg"),
-    previewAlt: "Portada gráfica de Caja San Pablo",
+    preview: null,
     download: asset("downloads/Caja-San-Pablo-Portable-1.0.1.exe"),
     downloadName: "Caja-San-Pablo-Portable-1.0.1.exe",
     downloadSize: "91,6 MB",
@@ -96,27 +95,6 @@ export const projects = [
     note: "El backend y la base de datos están desactivados en la demo pública; no permite realizar compras reales.",
   },
   {
-    id: "scout",
-    title: "Comunidad San Pablo",
-    subtitle: "Una comunidad, más cerca.",
-    category: "DISEÑO WEB / COMUNIDAD",
-    number: "05",
-    status: "En construcción",
-    description:
-      "Rediseño del sitio de la Comunidad Scout-guía San Pablo, con foco en claridad, experiencia de usuario y rendimiento.",
-    stack: ["HTML", "CSS", "JavaScript"],
-    preview: asset("previews/rediseñoWeb.webp"),
-    gif: asset("gifs/rediseñoWeb.webp"),
-    github: "https://github.com/SotoTomas/scout-guia-sp",
-    live: "https://sototomas.github.io/scout-guia-sp/",
-    challenge:
-      "Mejorar la forma en que la comunidad se presenta y comparte su información en la web.",
-    decision:
-      "Revisar la jerarquía visual y la experiencia de navegación del sitio existente.",
-    result:
-      "Un rediseño en construcción que conecta mi trabajo de desarrollo con mi participación en el mundo scout.",
-  },
-  {
     id: "rosco",
     title: "Rosco de palabras",
     subtitle: "Aprender también es jugar.",
@@ -147,12 +125,12 @@ export const projects = [
     description:
       "Una aventura narrativa y social en una academia de magia, donde tus elecciones construyen vínculos y dan forma a tu propia historia. Conocé a personajes originales, avanzá por capítulos, intercambiá mensajes y publicaciones, y participá en encuentros interactivos con inteligencia artificial.",
     stack: ["Narrativa interactiva", "IA", "Diseño responsive"],
-    preview: asset("previews/academia-magica.svg"),
-    previewAlt: "Portada gráfica de Academia Mágica Latinoamericana",
+    preview: null,
     github: null,
     live: "https://sototomas.github.io/academia-demo/",
     liveLabel: "Probar la IA y conocer personajes",
-    cardNote: "Demo disponible para interactuar con los personajes y probar la IA.",
+    cardNote:
+      "Demo disponible para interactuar con los personajes y probar la IA.",
     challenge:
       "Crear una historia propia dentro de una academia de magia, con vínculos que se construyen a partir de las decisiones de cada jugador.",
     decision:
@@ -171,8 +149,7 @@ export const projects = [
     description:
       "Plataforma de gestión documental para empresas argentinas. Lee facturas, recibos y otros comprobantes con OCR e inteligencia artificial, y organiza la información para facilitar su revisión y seguimiento comercial y fiscal. Automatiza tareas repetitivas sin perder de vista la evidencia ni el control humano.",
     stack: ["OCR", "Inteligencia artificial", "Gestión documental"],
-    preview: asset("previews/fageon.svg"),
-    previewAlt: "Portada gráfica de Fageon",
+    preview: null,
     github: null,
     live: null,
     challenge:
@@ -183,3 +160,19 @@ export const projects = [
       "Una plataforma que automatiza tareas documentales repetitivas y reúne la información para su consulta y seguimiento.",
   },
 ];
+
+// Explicit editorial order; indices always follow the visible selection.
+const projectOrder = [
+  "academia-magica",
+  "organiza",
+  "caja-san-pablo",
+  "fageon",
+  "artmap",
+  "tvlaravel",
+  "rosco",
+];
+export const projects = projectOrder.map((id, index) => ({
+  ...projectData.find((project) => project.id === id),
+  number: String(index + 1).padStart(2, "0"),
+  featured: id === "academia-magica" || id === "fageon",
+}));

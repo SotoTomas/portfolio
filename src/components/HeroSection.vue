@@ -1,5 +1,5 @@
 <template>
-  <section id="hero" class="hero" aria-labelledby="hero-title">
+  <section id="hero" class="hero theme-paper" aria-labelledby="hero-title">
     <div class="container">
       <div class="hero-meta" data-intro>
         <span class="eyebrow">Portfolio / Tomás Soto</span>
@@ -67,10 +67,10 @@
   margin-bottom: 40px;
 }
 h1 {
-  font-size: clamp(64px, 8.4vw, 120px);
-  line-height: 0.94;
+  font-size: var(--text-display);
+  line-height: 1.05;
   font-weight: 700;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.04em;
 }
 h1 em {
   color: var(--color-accent);
@@ -189,9 +189,6 @@ h1 em {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     padding-block: 72px 64px;
     gap: 48px 16px;
-  }
-  h1 {
-    font-size: clamp(52px, 12.5vw, 74px);
   }
   .hero-kicker {
     font-size: 10px;

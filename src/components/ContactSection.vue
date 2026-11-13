@@ -13,7 +13,7 @@ const links = [
 <template>
   <section
     id="contacto"
-    class="section contact"
+    class="section contact theme-ink"
     aria-labelledby="contact-title"
   >
     <div class="container">
@@ -69,10 +69,10 @@ const links = [
 }
 .contact h2 {
   font-family: var(--font-display);
-  font-size: clamp(72px, 9vw, 120px);
+  font-size: var(--text-contact);
   font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -0.045em;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
 }
 .contact h2 em {
   font-weight: inherit;
@@ -80,7 +80,7 @@ const links = [
   color: var(--color-accent);
 }
 .contact-arrow {
-  font-size: clamp(100px, 15vw, 200px);
+  font-size: clamp(64px, 7vw, 104px);
   font-weight: 400;
   line-height: 1;
   transition: transform 0.5s var(--ease);
@@ -104,7 +104,7 @@ const links = [
 .contact-email {
   display: inline-block;
   margin-top: 20px;
-  font-size: clamp(17px, 2.2vw, 28px);
+  font-size: clamp(16px, 1.5vw, 20px);
   border-bottom: 1px solid var(--color-text);
   padding-bottom: 8px;
 }
@@ -144,10 +144,10 @@ const links = [
   }
   .contact-arrow {
     padding: 0;
-    font-size: 90px;
+    font-size: 64px;
   }
   .contact h2 {
-    font-size: clamp(52px, 12vw, 72px);
+    line-height: 1.15;
   }
   .contact-main {
     gap: 10px;
@@ -155,11 +155,8 @@ const links = [
 }
 
 @media (max-width: 380px) {
-  .contact h2 {
-    font-size: 48px;
-  }
   .contact-arrow {
-    font-size: 60px;
+    font-size: 48px;
   }
 }
 </style>

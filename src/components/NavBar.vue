@@ -57,7 +57,7 @@ onBeforeUnmount(() => observer?.disconnect());
 }
 .wordmark {
   font-family: var(--font-display);
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: -1.1px;
   white-space: nowrap;

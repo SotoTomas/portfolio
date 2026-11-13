@@ -2,15 +2,17 @@
 const year = new Date().getFullYear();
 </script>
 <template>
-  <footer class="footer container">
-    <a href="#hero" class="footer-brand">Tomás Soto.</a>
-    <p>© {{ year }} · Diseño y código desde Buenos Aires.</p>
-    <a href="#hero" class="back-top">Volver al inicio ↑</a>
+  <footer class="footer theme-ink">
+    <div class="container footer-inner">
+      <a href="#hero" class="footer-brand">Tomás Soto.</a>
+      <p>© {{ year }} · Diseño y código desde Buenos Aires.</p>
+      <a href="#hero" class="back-top">Volver al inicio ↑</a>
+    </div>
   </footer>
 </template>
 <style scoped>
-.footer {
-  padding-block: 25px;
+.footer-inner {
+  padding-block: 24px;
   border-top: 1px solid var(--color-border);
   display: flex;
   align-items: center;
@@ -19,7 +21,7 @@ const year = new Date().getFullYear();
 }
 .footer-brand {
   font-family: var(--font-display);
-  font-size: 27px;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.04em;
 }
@@ -29,7 +31,7 @@ const year = new Date().getFullYear();
   color: var(--color-muted);
 }
 @media (max-width: 600px) {
-  .footer {
+  .footer-inner {
     flex-wrap: wrap;
   }
   .footer p {
