@@ -1,123 +1,13 @@
-<script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import { useMotion } from "@vueuse/motion";
-const photo = import.meta.env.BASE_URL + "yo.webp";
-const mark = ref(null);
-const motion = useMotion(mark, {
-  initial: { rotate: -12 },
-  rest: { rotate: -12 },
-  active: {
-    rotate: 12,
-    transition: { type: "spring", stiffness: 120, damping: 14 },
-  },
-});
-let media;
-function animate(active) {
-  if (!media?.matches) motion.apply(active ? "active" : "rest");
-}
-onMounted(() => {
-  media = matchMedia("(prefers-reduced-motion: reduce)");
-});
-onBeforeUnmount(() => motion.stop());
-const steps = [
-  {
-    label: "Entender",
-    text: "El punto de partida es una pregunta: ¿qué necesita la persona que va a usar esto? El problema define las decisiones que siguen.",
-  },
-  {
-    label: "Dar forma",
-    text: "Jerarquía, tipografía y espacio. Mi formación en diseño gráfico se encuentra con la lógica de una interfaz clara y accesible.",
-  },
-  {
-    label: "Construir",
-    text: "Llevo el diseño a Vue y conecto las piezas con Laravel cuando el proyecto lo necesita. Desarrollo, pruebo y ajusto la experiencia.",
-  },
-];
-const current = ref(0);
-</script>
 <template>
   <section
     id="sobre-mi"
     class="section about theme-stone"
-    aria-labelledby="about-title"
+    aria-label="Sobre mí"
   >
     <div class="container">
       <div class="section-topline">
         <span class="eyebrow">02 / Detrás de la interfaz</span
-        ><span class="eyebrow muted">La mirada también se entrena</span>
-      </div>
-      <div class="about-grid">
-        <div
-          class="portrait-col"
-          data-reveal
-          @pointerenter="animate(true)"
-          @pointerleave="animate(false)"
         >
-          <div class="portrait">
-            <img
-              :src="photo"
-              alt="Tomás Soto"
-              width="600"
-              height="750"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-          <span ref="mark" class="portrait-mark" aria-hidden="true">✳</span>
-          <p class="portrait-caption">
-            Tomás Soto <span>Ramos Mejía, Buenos Aires</span>
-          </p>
-        </div>
-        <div class="about-copy" data-reveal>
-          <h2 id="about-title" class="section-title">
-            Pienso como diseñador.<br />Construyo como<br /><em
-              >desarrollador.</em
-            >
-          </h2>
-          <p>
-            Soy Tomás, desarrollador frontend y estudiante de Diseño Gráfico y
-            Digital. Me interesa ese lugar donde una buena idea encuentra una
-            forma clara de funcionar.
-          </p>
-          <p>
-            Trabajo con Vue, Laravel e Inertia para construir productos web.
-            Fuera de la pantalla, el taekwondo y la vida scout también forman
-            parte de mi manera de aprender, colaborar y mirar el mundo.
-          </p>
-          <a
-            class="text-link"
-            href="https://drive.google.com/file/d/1puI-RE6yFmft3kPmQP4q3xNd4flg1JJV/view?usp=sharing"
-            target="_blank"
-            rel="noopener noreferrer"
-            >Ver mi CV <span aria-hidden="true">↗</span></a
-          >
-        </div>
-      </div>
-      <div class="process" data-reveal>
-        <span class="eyebrow">De la intención a la experiencia</span>
-        <div
-          class="process-buttons"
-          role="group"
-          aria-label="Explorar mi proceso"
-        >
-          <button
-            v-for="(step, i) in steps"
-            :key="step.label"
-            :aria-pressed="current === i"
-            aria-controls="process-description"
-            @click="current = i"
-          >
-            <span>0{{ i + 1 }}</span
-            >{{ step.label }}<b aria-hidden="true">↗</b>
-          </button>
-        </div>
-        <p
-          id="process-description"
-          class="process-description"
-          aria-live="polite"
-        >
-          {{ steps[current].text }}
-        </p>
       </div>
       <div class="background-grid">
         <div class="education" data-reveal>

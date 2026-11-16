@@ -10,7 +10,8 @@ const projectData = [
     description:
       "Agenda y gestión de clientes para profesionales freelance. Tareas, contactos y entregas conectados en un mismo espacio.",
     stack: ["Vue 3", "Tailwind CSS", "Electron"],
-    preview: null,
+    preview: asset("previews/organiza.png"),
+    previewAlt: "Vista semanal de la agenda de Organiza",
     download:
       "https://github.com/SotoTomas/portfolio/releases/download/organiza-v1.1.3/Organiza-Portable-1.1.3.exe",
     downloadName: "Organiza-Portable-1.1.3.exe",
@@ -36,7 +37,8 @@ const projectData = [
     description:
       "Herramienta contable para gestionar ventas, productos, stock y gastos de ferias, eventos y campamentos de la comunidad San Pablo.",
     stack: ["Vue 3", "IndexedDB", "Electron"],
-    preview: null,
+    preview: asset("previews/contabilidad.png"),
+    previewAlt: "Panel de gestión de campamentos de Caja San Pablo",
     download: asset("downloads/Caja-San-Pablo-Portable-1.0.1.exe"),
     downloadName: "Caja-San-Pablo-Portable-1.0.1.exe",
     downloadSize: "91,6 MB",
@@ -125,7 +127,8 @@ const projectData = [
     description:
       "Una aventura narrativa y social en una academia de magia, donde tus elecciones construyen vínculos y dan forma a tu propia historia. Conocé a personajes originales, avanzá por capítulos, intercambiá mensajes y publicaciones, y participá en encuentros interactivos con inteligencia artificial.",
     stack: ["Narrativa interactiva", "IA", "Diseño responsive"],
-    preview: null,
+    preview: asset("previews/academia.png"),
+    previewAlt: "Escena interactiva de Academia Mágica Latinoamericana con Josefina",
     github: null,
     live: "https://sototomas.github.io/academia-demo/",
     liveLabel: "Probar la IA y conocer personajes",
@@ -149,9 +152,10 @@ const projectData = [
     description:
       "Plataforma de gestión documental para empresas argentinas. Lee facturas, recibos y otros comprobantes con OCR e inteligencia artificial, y organiza la información para facilitar su revisión y seguimiento comercial y fiscal. Automatiza tareas repetitivas sin perder de vista la evidencia ni el control humano.",
     stack: ["OCR", "Inteligencia artificial", "Gestión documental"],
-    preview: null,
+    preview: asset("previews/fageon.png"),
+    previewAlt: "Pantalla de la demo interactiva de Fageon para revisar comprobantes",
     github: null,
-    live: null,
+    live: "https://sototomas.github.io/fageon-demo/",
     challenge:
       "Facilitar la revisión y el seguimiento comercial y fiscal de facturas, recibos y otros comprobantes de empresas argentinas.",
     decision:

@@ -1,3 +1,6 @@
+<script setup>
+const photo = import.meta.env.BASE_URL + "yo.png";
+</script>
 <template>
   <section id="hero" class="hero theme-paper" aria-labelledby="hero-title">
     <div class="container">
@@ -10,19 +13,50 @@
           <p class="hero-kicker eyebrow" data-intro>
             Diseño gráfico + Desarrollo frontend
           </p>
-          <h1 id="hero-title" data-intro>
-            De la idea<br />a la <em>interfaz.</em>
-          </h1>
+          <h1 id="hero-title" class="hero-name" data-intro>Tomás Soto</h1>
+      <div class="about-grid">
+        <div
+          class="portrait-col"
+        >
+          <div class="portrait">
+            <img
+              :src="photo"
+              alt="Tomás Soto"
+              width="600"
+              height="750"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <span class="portrait-mark" aria-hidden="true">✳</span>
+          <p class="portrait-caption">
+            Tomás Soto <span>Ramos Mejía, Buenos Aires</span>
+          </p>
+        </div>
+        <div class="about-copy" >
+          <p>
+            Soy Tomás, desarrollador frontend y estudiante de Diseño Gráfico y
+            Digital. Me interesa ese lugar donde una buena idea encuentra una
+            forma clara de funcionar.
+          </p>
+          <p>
+            Trabajo con Vue, Laravel e Inertia para construir productos web.
+            Fuera de la pantalla, el taekwondo y la vida scout también forman
+            parte de mi manera de aprender, colaborar y mirar el mundo.
+          </p>
+          <a
+            class="text-link"
+            href="https://drive.google.com/file/d/1puI-RE6yFmft3kPmQP4q3xNd4flg1JJV/view?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Ver mi CV <span aria-hidden="true">↗</span></a
+          >
+        </div>
+      </div>
+
         </div>
         <div class="hero-aside" data-intro>
-          <span class="vertical-label">Diseño / Desarrollo / Dirección</span>
-          <p class="hero-description">
-            Le doy forma a lo que imaginás. Diseño y desarrollo experiencias
-            digitales con intención, carácter y código.
-          </p>
-          <a class="hero-cta" href="#portfolio"
-            >Explorá mis proyectos <span aria-hidden="true">↘</span></a
-          >
+          <div class="vertical-label"><span>Diseño / Desarrollo / Dirección</span><span>Identidad / Interfaz / Experiencia</span><span>Ideas / Forma / Código</span></div>
         </div>
       </div>
       <div class="hero-bottom" data-intro>
@@ -35,14 +69,25 @@
         <span class="edition eyebrow">Diseño + código</span>
       </div>
       <div class="discipline-index" aria-label="Disciplinas">
-        <span><b>01</b> Diseño con intención</span>
-        <span><b>02</b> Código con carácter</span>
-        <span><b>03</b> Ideas que toman forma</span>
+        <span><b>01</b> Integración de API de IA</span>
+        <span><b>02</b> Mapas interactivos</span>
+        <span><b>03</b> Aplicaciones web con Vue</span>
       </div>
     </div>
   </section>
 </template>
 <style scoped>
+.hero-name { font-size: clamp(42px, 6vw, 90px); margin-bottom: 36px; }
+.about-grid { display: grid; grid-template-columns: minmax(160px, 300px) minmax(0, 1fr); gap: 32px; align-items: start; }
+.portrait-col { position: relative; }
+.portrait { overflow: hidden; aspect-ratio: 4 / 5; position: relative; }
+.portrait img { width: 100%; height: 100%; object-fit: cover; object-position: center top; filter: grayscale(1); }
+.portrait-mark { position: absolute; right: -18px; top: -24px; font-size: 48px; color: var(--color-accent); }
+.portrait-caption { font-size: 12px; margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; }
+.portrait-caption span, .about-copy p { color: var(--color-muted); }
+.about-copy p { font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+@media (max-width: 600px) { .about-grid { grid-template-columns: 1fr; } .portrait-col { max-width: 260px; } }
+
 .hero-meta {
   display: flex;
   justify-content: space-between;
@@ -78,18 +123,27 @@ h1 em {
 }
 .hero-aside {
   grid-column: 10 / -1;
-  position: relative;
-  padding-top: 112px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 24px;
+  min-width: 0;
 }
 .vertical-label {
-  position: absolute;
-  top: -120px;
-  right: 0;
-  writing-mode: vertical-rl;
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-end;
+  gap: 14px;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.13em;
 }
+.vertical-label span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+}
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; }
 .hero-description {
   font-size: 16px;
   line-height: 1.5;
@@ -163,13 +217,8 @@ h1 em {
     grid-column: 1 / -1;
   }
   .hero-aside {
-    grid-column: 5 / -1;
-    padding-top: 0;
-  }
-  .vertical-label {
-    top: 0;
-    right: auto;
-    left: -64px;
+    grid-column: 1 / -1;
+    justify-content: flex-end;
   }
   .hero-description {
     max-width: 340px;
@@ -196,12 +245,11 @@ h1 em {
     margin-bottom: 32px;
   }
   .hero-aside {
-    grid-column: 2 / -1;
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+    gap: 20px;
   }
-  .vertical-label {
-    left: -40px;
-    font-size: 10px;
-  }
+  .vertical-label { gap: 8px; font-size: 9px; letter-spacing: 0.08em; }
   .hero-bottom {
     flex-wrap: wrap;
     gap: 8px;

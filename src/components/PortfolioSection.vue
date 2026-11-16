@@ -1,21 +1,88 @@
 <script setup>
-import { ref, nextTick, onBeforeUnmount } from "vue";
+import { ref, nextTick, onMounted, onBeforeUnmount, watch } from "vue";
 import { projects } from "../data/projects";
 const selected = ref(null);
 const dialog = ref(null);
-const hovered = ref(null);
-const loadedPreviews = ref(new Set());
-const failedPreviews = ref(new Set());
+const carousel = ref(null);
+const viewport = ref(null);
+const track = ref(null);
+const orderedProjects = ref([...projects]);
+const playing = ref(false);
+const pointerInside = ref(false);
+const focusInside = ref(false);
+const inView = ref(false);
+const pageVisible = ref(true);
+let frame = 0;
+let previousTime = 0;
+let offset = 0;
+let observer;
+let motionPreference;
 let transition;
-function preview(project, event) {
-  if (event?.pointerType === "touch" || matchMedia("(hover: none)").matches || matchMedia("(prefers-reduced-motion: reduce)").matches || navigator.connection?.saveData) return;
-  hovered.value = project.id;
+
+function applyOffset() {
+  if (track.value) track.value.style.transform = `translate3d(${-offset}px, 0, 0)`;
 }
-function previewLoaded(id) { loadedPreviews.value.add(id); }
-function previewFailed(id) { failedPreviews.value.add(id); }
-function leaveProject(event) {
-  if (!event.currentTarget.contains(event.relatedTarget)) hovered.value = null;
+function stepWidth() {
+  const first = track.value?.firstElementChild;
+  if (!first) return 0;
+  return first.offsetWidth + (parseFloat(getComputedStyle(track.value).columnGap) || 0);
 }
+function animate(time) {
+  frame = 0;
+  if (!playing.value || pointerInside.value || focusInside.value || !inView.value || !pageVisible.value || selected.value) {
+    previousTime = 0;
+    return;
+  }
+  if (previousTime) {
+    offset += Math.min(time - previousTime, 50) * 0.03;
+    const step = stepWidth();
+    if (step && offset >= step) {
+      offset -= step;
+      orderedProjects.value = [...orderedProjects.value.slice(1), orderedProjects.value[0]];
+    }
+    applyOffset();
+  }
+  previousTime = time;
+  frame = requestAnimationFrame(animate);
+}
+function syncPlayback() {
+  cancelAnimationFrame(frame);
+  frame = 0;
+  previousTime = 0;
+  if (playing.value && !pointerInside.value && !focusInside.value && inView.value && pageVisible.value && !selected.value) {
+    frame = requestAnimationFrame(animate);
+  }
+}
+function moveProjects(direction) {
+  playing.value = false;
+  offset = 0;
+  if (viewport.value) viewport.value.scrollLeft = 0;
+  const items = orderedProjects.value;
+  orderedProjects.value = direction > 0
+    ? [...items.slice(1), items[0]]
+    : [items[items.length - 1], ...items.slice(0, -1)];
+  applyOffset();
+}
+function leaveCarousel(event) {
+  if (!event.currentTarget.contains(event.relatedTarget)) {
+    focusInside.value = false;
+    if (viewport.value) viewport.value.scrollLeft = 0;
+  }
+}
+function updateVisibility() { pageVisible.value = !document.hidden; }
+function updateMotionPreference(event) { if (event.matches) playing.value = false; }
+watch([playing, pointerInside, focusInside, inView, pageVisible, selected], syncPlayback);
+onMounted(() => {
+  motionPreference = matchMedia("(prefers-reduced-motion: reduce)");
+  playing.value = !motionPreference.matches;
+  motionPreference.addEventListener("change", updateMotionPreference);
+  document.addEventListener("visibilitychange", updateVisibility);
+  updateVisibility();
+  if ("IntersectionObserver" in window) {
+    observer = new IntersectionObserver(([entry]) => { inView.value = entry.isIntersecting; });
+    observer.observe(carousel.value);
+  } else inView.value = true;
+});
 async function change(update) {
   transition?.skipTransition();
   if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -29,7 +96,14 @@ function open(project) {
 function close() {
   change(() => { dialog.value?.close(); selected.value = null; });
 }
-onBeforeUnmount(() => { transition?.skipTransition(); dialog.value?.close(); });
+onBeforeUnmount(() => {
+  cancelAnimationFrame(frame);
+  observer?.disconnect();
+  motionPreference?.removeEventListener("change", updateMotionPreference);
+  document.removeEventListener("visibilitychange", updateVisibility);
+  transition?.skipTransition();
+  dialog.value?.close();
+});
 </script>
 <template>
   <section id="portfolio" class="section projects theme-white" aria-labelledby="projects-title">
@@ -41,32 +115,36 @@ onBeforeUnmount(() => { transition?.skipTransition(); dialog.value?.close(); });
       <div class="projects-heading" data-reveal>
         <h2 id="projects-title" class="section-title">Proyectos</h2>
       </div>
-      <div class="project-grid" data-reveal>
-        <article v-for="project in projects" :key="project.id" class="project"
-          :class="['project-' + project.id, { 'project-featured': project.featured }]"
-          @pointerenter="preview(project, $event)" @pointerleave="hovered = null"
-          @focusin="preview(project)" @focusout="leaveProject">
-          <button class="project-cover"
-            :class="['cover-' + project.id, { 'is-previewing': hovered === project.id }]"
+      <div ref="carousel" class="projects-carousel" role="region" aria-roledescription="carrusel" aria-label="Proyectos seleccionados" data-reveal>
+        <div class="carousel-controls" aria-label="Controles del carrusel">
+          <span class="eyebrow muted">Explorá los proyectos</span>
+          <div class="carousel-buttons">
+            <button type="button" @click="moveProjects(-1)" aria-label="Proyecto anterior">←</button>
+            <button type="button" @click="moveProjects(1)" aria-label="Proyecto siguiente">→</button>
+            <button type="button" class="carousel-toggle" @click="playing = !playing" :aria-label="playing ? 'Pausar carrusel' : 'Reproducir carrusel'">{{ playing ? 'Pausar' : 'Reproducir' }} <span aria-hidden="true">{{ playing ? 'Ⅱ' : '▶' }}</span></button>
+          </div>
+        </div>
+        <div ref="viewport" class="carousel-viewport" @pointerenter="event => { if (event.pointerType !== 'touch') pointerInside = true; }" @pointerleave="pointerInside = false" @focusin="focusInside = true" @focusout="leaveCarousel">
+        <div ref="track" class="project-track">
+        <article v-for="project in orderedProjects" :key="project.id" class="project"
+          :class="['project-' + project.id, { 'project-featured': project.featured }]">
+          <button class="project-cover" :class="'cover-' + project.id"
             @click="open(project)" :aria-label="'Ver el caso de ' + project.title" aria-haspopup="dialog">
-            <span class="project-turn" aria-hidden="true">
-              <span class="project-face project-front">
-                <img v-if="project.preview" :src="project.preview" alt="" width="1200" height="675" loading="lazy" decoding="async" />
-              </span>
-              <span class="project-face project-back">
-                <img v-if="project.preview" :src="project.preview" alt="" width="1200" height="675" loading="lazy" decoding="async" />
-                <img v-if="hovered === project.id && project.gif && !failedPreviews.has(project.id)"
-                  class="project-animation" :class="{ 'is-loaded': loadedPreviews.has(project.id) }"
-                  :src="project.gif" alt="" decoding="async" @load="previewLoaded(project.id)" @error="previewFailed(project.id)" />
-              </span>
+            <img v-if="project.preview" class="project-image" :src="project.preview" alt="" width="1200" height="675" loading="lazy" decoding="async" />
+            <span class="project-caption">
+              <span class="project-number">{{ project.number }}</span>
+              <span class="project-title">{{ project.title }}</span>
+              <span class="project-plus" aria-hidden="true">+</span>
             </span>
-            <span class="cover-label" aria-hidden="true">{{ project.number }}{{ project.featured ? ' / DESTACADO' : '' }}</span>
           </button>
-          <div class="project-info">
-            <h3>{{ project.title }}</h3>
-            <button class="project-more" @click="open(project)" :aria-label="'Más sobre ' + project.title" aria-haspopup="dialog"><span aria-hidden="true">+</span></button>
+          <div v-if="project.live || project.github || project.download" class="project-links" :aria-label="'Enlaces de ' + project.title">
+            <a v-if="project.live" :href="project.live" target="_blank" rel="noopener noreferrer">Explorar demo <span aria-hidden="true">↗</span></a>
+            <a v-if="project.github" :href="project.github" target="_blank" rel="noopener noreferrer">Ver código <span aria-hidden="true">↗</span></a>
+            <a v-if="project.download" :href="project.download" :download="project.downloadName">Descargar aplicación <span aria-hidden="true">↓</span></a>
           </div>
         </article>
+        </div>
+        </div>
       </div>
       <a class="text-link all-projects" href="https://github.com/SotoTomas" target="_blank" rel="noopener noreferrer">Más código, experimentos e ideas en GitHub <span aria-hidden="true">↗</span></a>
     </div>
@@ -99,39 +177,40 @@ onBeforeUnmount(() => { transition?.skipTransition(); dialog.value?.close(); });
 </template>
 <style scoped>
 .projects { padding-top: 96px; }
-.projects-heading { margin-bottom: 64px; }
-.project-grid { display: grid; width: min(100%, 960px); margin-inline: auto; aspect-ratio: 3 / 2; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: repeat(9, minmax(0, 1fr)); gap: 0; isolation: isolate; }
-.project { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
-.project-academia-magica { grid-area: 1 / 1 / 4 / 9; }
-.project-organiza { grid-area: 1 / 9 / 3 / 13; }
-.project-caja-san-pablo { grid-area: 3 / 9 / 5 / 13; }
-.project-fageon { grid-area: 4 / 1 / 7 / 9; }
-.project-artmap { grid-area: 5 / 9 / 7 / 13; }
-.project-tvlaravel { grid-area: 7 / 1 / 10 / 7; }
-.project-rosco { grid-area: 7 / 7 / 10 / 13; }
-.project-cover { --cover-bg: #e7e8e1; display: block; position: relative; width: 100%; height: 100%; min-height: 0; background: var(--cover-bg); padding: 0; perspective: 1600px; text-align: left; }
-.project-cover:focus-visible { outline-offset: -4px; }
+.projects-heading { margin-bottom: 40px; }
+.carousel-controls { display: flex; justify-content: space-between; align-items: center; gap: 16px; border-top: 1px solid var(--color-border); padding: 16px 0; }
+.carousel-buttons { display: flex; align-items: center; gap: 8px; }
+.carousel-buttons button { min-width: 44px; min-height: 44px; background: transparent; border: 1px solid var(--color-border); font-size: 20px; transition: color .2s, border-color .2s; }
+.carousel-buttons button:hover, .carousel-buttons button:focus-visible { color: var(--color-accent); border-color: currentColor; }
+.carousel-buttons .carousel-toggle { padding: 0 12px; font-size: 12px; }
+.carousel-toggle span { margin-left: 8px; }
+.carousel-viewport { overflow: hidden; }
+.project-track { display: flex; align-items: start; gap: 24px; width: max-content; }
+.project { flex: 0 0 clamp(240px, 25vw, 320px); min-width: 0; }
+.project-cover { --cover-bg: #e7e8e1; display: block; position: relative; width: 100%; aspect-ratio: 4 / 3; min-height: 0; overflow: hidden; background: var(--cover-bg); padding: 0; text-align: left; }
+
+.project-cover:focus-visible { outline: 3px solid var(--color-accent); outline-offset: -3px; z-index: 2; }
 .cover-academia-magica { --cover-bg: #d8cdd8; }
 .cover-fageon { --cover-bg: #c8d7ce; }
 .cover-organiza { --cover-bg: #e9e3d5; }
 .cover-caja-san-pablo { --cover-bg: #d7dfe5; }
-.project-turn { position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .85s var(--ease); }
-.is-previewing .project-turn { transform: rotateY(180deg); }
-.project-face { position: absolute; inset: 0; display: block; overflow: hidden; background: var(--cover-bg); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-.project-back { transform: rotateY(180deg); }
-.project-face > img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
-.project-face > .project-animation { position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease .25s; }
-.is-previewing .project-animation.is-loaded { opacity: 1; }
-.cover-label { position: absolute; top: 16px; left: 16px; padding: 8px; background: var(--color-bg); color: var(--color-text); font-size: 10px; letter-spacing: .1em; pointer-events: none; opacity: 0; transition: opacity .25s ease; }
-.project-info { position: absolute; inset: auto 24px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px; background: var(--color-bg); opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity .25s ease, transform .3s var(--ease); }
-.project:hover .project-info, .project:focus-within .project-info { opacity: 1; transform: none; pointer-events: auto; }
-.project:hover .cover-label, .project:focus-within .cover-label { opacity: 1; }
-.project-info h3 { min-width: 0; font-size: clamp(18px, 1.5vw, 22px); font-weight: 700; letter-spacing: -.025em; line-height: 1.15; overflow-wrap: anywhere; }
-.project-featured h3 { font-size: clamp(22px, 2vw, 28px); }
-.project-more { flex-shrink: 0; display: grid; place-items: center; width: 48px; height: 48px; background: transparent; border-bottom: 1px solid var(--color-border); font-size: 32px; line-height: 1; transition: color .25s, border-color .25s; }
-.project-more span { transition: transform .3s var(--ease); }
-.project-more:hover, .project-more:focus-visible { color: var(--color-accent); border-color: currentColor; }
-.project-more:hover span { transform: rotate(90deg); }
+.project-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; transition: transform .45s var(--ease); }
+.project-caption { position: absolute; inset: auto 0 0; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; gap: 8px; padding: 12px; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); }
+.project-caption::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: 3px; background: var(--color-accent); transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ease); }
+.project-number { font-size: 10px; line-height: 1.5; color: var(--color-muted); }
+.project-title { font-size: clamp(12px, 1.05vw, 15px); line-height: 1.25; font-weight: 700; overflow-wrap: anywhere; }
+.project-plus { font-size: 20px; line-height: .9; transition: color .2s ease; }
+@media (hover: hover) {
+  .project-cover:hover .project-image { transform: scale(1.035); }
+  .project-cover:hover .project-caption::before { transform: scaleX(1); }
+  .project-cover:hover .project-plus { color: var(--color-accent); }
+}
+.project-cover:focus-visible .project-image { transform: scale(1.035); }
+.project-cover:focus-visible .project-caption::before { transform: scaleX(1); }
+.project-cover:focus-visible .project-plus { color: var(--color-accent); }
+.project-links { display: flex; flex-wrap: wrap; gap: 8px 24px; padding-top: 16px; font-size: 13px; line-height: 1.5; }
+.project-links a { border-bottom: 1px solid currentColor; padding-bottom: 3px; }
+.project-links a:hover, .project-links a:focus-visible { color: var(--color-accent); }
 .all-projects { margin-top: 64px; }
 .case-stack { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 24px; }
 .case-dialog { border: 1px solid var(--color-border); padding: 0; background: var(--color-bg); color: var(--color-text); max-width: 1000px; width: calc(100% - 40px); max-height: 90dvh; }
@@ -147,43 +226,26 @@ onBeforeUnmount(() => { transition?.skipTransition(); dialog.value?.close(); });
 .case-story p { font-size: 14px; line-height: 1.5; color: var(--color-muted); }
 .case-note { background: var(--color-surface); padding: 18px; margin-top: 30px; font-size: 14px; line-height: 1.7; }
 .case-links { display: flex; align-items: center; flex-wrap: wrap; gap: 25px; margin-top: 25px; }
-@media (max-width: 1000px) and (min-width: 601px) {
-  .project-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); aspect-ratio: 4 / 3; }
-  .project-academia-magica { grid-area: 1 / 1 / 4 / 6; }
-  .project-organiza { grid-area: 1 / 6 / 3 / 9; }
-  .project-caja-san-pablo { grid-area: 3 / 6 / 5 / 9; }
-  .project-fageon { grid-area: 4 / 1 / 7 / 6; }
-  .project-artmap { grid-area: 5 / 6 / 7 / 9; }
-  .project-tvlaravel { grid-area: 7 / 1 / 10 / 5; }
-  .project-rosco { grid-area: 7 / 5 / 10 / 9; }
-  .project-info { gap: 8px; inset: auto 16px 16px; padding: 12px; }
-  .project-more { width: 44px; height: 44px; }
-}
+
 @media (max-width: 600px) {
   .projects { padding-top: 72px; }
-  .projects-heading { margin-bottom: 40px; }
+  .projects-heading { margin-bottom: 24px; }
   .section-topline { gap: 16px; }
   .section-topline .eyebrow { font-size: 10px; letter-spacing: .06em; }
-  .project-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: auto; aspect-ratio: auto; }
-  .project { grid-area: auto / 1 / auto / -1; }
-  .project-cover { aspect-ratio: 16 / 10; height: auto; }
-  .project-featured .project-cover { aspect-ratio: 4 / 3; }
-  .project-featured h3 { font-size: 24px; }
-  .project-info { inset: auto 16px 16px; padding: 12px; gap: 8px; opacity: 1; transform: none; pointer-events: auto; }
-  .project-info h3 { overflow-wrap: normal; }
+  .carousel-controls { align-items: end; }
+  .carousel-controls > .eyebrow { max-width: 105px; line-height: 1.5; }
+  .project-track { gap: 16px; }
+  .project { flex-basis: min(75vw, 280px); }
+  .project-cover, .project-featured .project-cover { aspect-ratio: 4 / 3; }
   .case-inner { padding: 24px; }
   .case-story { grid-template-columns: 1fr; }
   .case-top .eyebrow { font-size: 11px; }
   .case-close { white-space: nowrap; }
   .case-dialog { width: calc(100% - 20px); }
 }
-@media (hover: none) {
-  .project-info { opacity: 1; transform: none; pointer-events: auto; }
-}
-@media (prefers-reduced-motion: reduce) {
 
-  .project-turn, .is-previewing .project-turn { transform: none; transition: none; }
-  .project-back { display: none; }
-  .project-more:hover span { transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .project-image, .project-caption::before, .project-plus { transition: none; }
+  .project-cover:hover .project-image, .project-cover:focus-visible .project-image { transform: none; }
 }
 </style>
